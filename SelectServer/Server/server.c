@@ -38,7 +38,7 @@ int main()
         rdtemp = rdset;
         int num = select(maxfd+1, &rdtemp, NULL, NULL, NULL);
         // rdset中的数据被内核改写了, 只保留了发生变化的文件描述的标志位上的1, 没变化的改为0
-        // 只要rdset中的fd对应的标志位为1 -> 缓冲区有数据了
+        // 只要rdset中的fd对应的标志位为1,则缓冲区有数据了
         // 判断
         // 有没有新连接
         if(FD_ISSET(lfd, &rdtemp))
@@ -47,7 +47,13 @@ int main()
             struct sockaddr_in cliaddr;
             int cliLen = sizeof(cliaddr);
             int cfd = accept(lfd, (struct sockaddr*)&cliaddr, &cliLen);
-
+            
+            // 打印客户端的地址信息
+            char ip[24] = {0};
+            printf("客户端的IP地址: %s, 端口: %d\n",
+            inet_ntop(AF_INET, &cliaddr.sin_addr.s_addr, ip, sizeof(ip)),    //将ip地址二进制转成字符串
+            ntohs(cliaddr.sin_port));
+            
             // 得到了有效的文件描述符
             // 通信的文件描述符添加到读集合
             // 在下一轮select检测的时候, 就能得到缓冲区的状态
@@ -63,11 +69,11 @@ int main()
             if(i != lfd && FD_ISSET(i, &rdtemp))
             {
                 // 接收数据
-                char buf[10] = {0};
+                char buf[100]={0};
                 // 一次只能接收10个字节, 客户端一次发送100个字节
                 // 一次是接收不完的, 文件描述符对应的读缓冲区中还有数据
                 // 下一轮select检测的时候, 内核还会标记这个文件描述符缓冲区有数据 -> 再读一次
-                // 	循环会一直持续, 知道缓冲区数据被读完位置
+                // 	循环会一直持续, 直到缓冲区数据被读完为止
                 int len = read(i, buf, sizeof(buf));
                 if(len == 0)
                 {
@@ -79,6 +85,7 @@ int main()
                 else if(len > 0)
                 {
                     // 收到了数据
+                    printf("%s\n",buf);
                     // 发送数据
                     write(i, buf, strlen(buf)+1);
                 }
