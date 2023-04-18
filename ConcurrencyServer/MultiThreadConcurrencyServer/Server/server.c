@@ -27,6 +27,12 @@ void* working(void* arg)
     while(1)
     {
         struct SockInfo* info = (struct SockInfo*)arg;
+        // 打印客户端的地址信息
+            char ip[24] = {0};
+            printf("客户端的IP地址: %s, 端口: %d\n",
+                inet_ntop(AF_INET, info->addr.sin_addr.s_addr, ip, sizeof(ip)),    //将ip地址二进制转成字符串
+                ntohs(info->addr.sin_port));
+
         // 接收数据
         char buf[1024];
         // read函数用来从套接字中读取数据，第一个参数是套接字描述符，第二个参数是缓冲区，第三个参数是缓冲区大小，返回值是实际读取的字节数

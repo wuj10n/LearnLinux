@@ -27,7 +27,7 @@ int main()
     // 如果connect函数成功，它会返回0，并在内核中建立一个TCP连接。如果失败，它会返回-1，并设置errno变量，表示错误的原因。
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(10000);   // 大端端口
+    addr.sin_port = htons(8989);   // 大端端口
 
     // inet_pton(AF_INET, "192.168.237.131", &addr.sin_addr.s_addr);
 
